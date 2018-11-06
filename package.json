@@ -1,6 +1,6 @@
 {
   "name": "use-class-hooks",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Use react hooks in classes",
   "author": "tannerlinsley",
   "license": "MIT",
