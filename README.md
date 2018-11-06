@@ -23,7 +23,7 @@ yarn add use-class-hooks
 import React from "react";
 import "use-class-hooks";
 
-class Example extends Component {
+class Example extends React.Component {
   render() {
     const [count, setCount] = this.useState(0);
     return (
