@@ -47,6 +47,7 @@ The following hooks are available on the class instance and follow the official 
 - `this.useMemo`
 - `this.useCallback`
 - `this.useEffect`
+- `this.useRef`
 
 The following hooks are not yet available. Feel free to submit a PR!
 

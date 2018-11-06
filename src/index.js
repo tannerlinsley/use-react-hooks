@@ -24,6 +24,16 @@ if (!React.Component.__hookPatched) {
     componentDidUpdate() {}
     componentWillUnmount() {}
 
+    useRef = initialValue => {
+      const hookID = this.leaseHookID()
+      if (!this.__hooks[hookID]) {
+        this.__hooks[hookID] = {
+          current: initialValue
+        }
+      }
+      return this.__hooks[hookID]
+    }
+
     useReducer = (reducer, initialState) => {
       const hookID = this.leaseHookID()
       if (!this.__hooks[hookID]) {
