@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2
+
+- Warn if not running version 16.6 when using `this.useContext()`
+
 ## 0.2.1
 
 - Require at least version 16.6 of React

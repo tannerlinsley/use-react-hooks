@@ -55,6 +55,12 @@ if (!React.Component.__hookPatched) {
     }
 
     useContext = context => {
+      const dispatcher = getDispatcher()
+      if (!dispatcher) {
+        throw new Error(
+          'Oh no! You are either trying to use this.useContext() outside of a classes render function, or you may not be running React 16.6 or higher.'
+        )
+      }
       return getDispatcher().readContext(context)
     }
 
