@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.3
+
+- Also patch `React.PureComponent`
+
 ## 0.2.2
 
 - Warn if not running version 16.6 when using `this.useContext()`

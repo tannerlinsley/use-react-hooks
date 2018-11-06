@@ -2,8 +2,13 @@ import React from 'react'
 
 // Only patch react once
 if (!React.Component.__hookPatched) {
+  patch('Component')
+  patch('PureComponent')
+}
+
+function patch(name) {
   // Patch React.Component
-  React.Component = class Component extends React.Component {
+  React[name] = class Component extends React[name] {
     constructor(props) {
       super(props)
       // Every render, we need to reset the instance's
