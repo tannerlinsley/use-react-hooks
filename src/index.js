@@ -73,15 +73,14 @@ export function useReducer(reducer, initialState) {
   if (!hooks[hookID]) {
     hooks[hookID] = initialState
   }
-  const state = hooks[hookID]
   const dispatch = action => {
-    const newState = reducer(state, action)
-    if (state !== newState) {
+    const newState = reducer(hooks[hookID], action)
+    if (hooks[hookID] !== newState) {
       hooks[hookID] = newState
       instance.forceUpdate() // TODO: IS this too naive?
     }
   }
-  return [state, dispatch]
+  return [hooks[hookID], dispatch]
 }
 
 export function useState(initialState) {
@@ -114,13 +113,12 @@ export function useMemo(memo, watchItems) {
       computed: null
     }
   }
-  const record = hooks[hookID]
-  let needsUpdate = hasChanged(record.watchItems, watchItems)
+  let needsUpdate = hasChanged(hooks[hookID].watchItems, watchItems)
   if (needsUpdate) {
-    record.watchItems = watchItems
-    record.computed = memo()
+    hooks[hookID].watchItems = watchItems
+    hooks[hookID].computed = memo()
   }
-  return record.computed
+  return hooks[hookID].computed
 }
 
 export function useCallback(callback, watchItems) {
@@ -129,36 +127,32 @@ export function useCallback(callback, watchItems) {
 
 export function useEffect(effect, watchItems) {
   const [hooks, hookID] = leaseHook()
-  let record
-  if (hooks[hookID]) {
-    record = hooks[hookID]
-  } else {
+  if (!hooks[hookID]) {
     hooks[hookID] = {
       shouldUpdate: false,
       watchItems: null,
       unwinder: null,
       effect: null,
       runEffect: () => {
-        if (record.shouldUpdate) {
-          record.unwind = effect()
+        if (hooks[hookID].shouldUpdate) {
+          hooks[hookID].unwind = hooks[hookID].effect()
         }
       },
       runUnwind: () => {
-        if (record.shouldUpdate && record.unwind) {
-          record.unwind()
+        if (hooks[hookID].shouldUpdate && hooks[hookID].unwind) {
+          hooks[hookID].unwind()
         }
       }
     }
-    record = hooks[hookID]
   }
 
-  record.effect = effect
-  record.shouldUpdate = false
+  hooks[hookID].effect = effect
+  hooks[hookID].shouldUpdate = false
 
-  let needsUpdate = hasChanged(record.watchItems, watchItems)
+  let needsUpdate = hasChanged(hooks[hookID].watchItems, watchItems)
   if (needsUpdate) {
-    record.shouldUpdate = true
-    record.watchItems = watchItems
+    hooks[hookID].shouldUpdate = true
+    hooks[hookID].watchItems = watchItems
   }
 }
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3
+
+- Always use bracket/property notation to avoid stale instance variables
+
 ## 1.0.2
 
 - Removed a stray console.log()
