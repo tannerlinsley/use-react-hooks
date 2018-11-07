@@ -6667,7 +6667,7 @@ url@^0.11.0:
     punycode "1.3.2"
     querystring "0.2.0"
 
-"use-class-hooks@link:..":
+"use-react-hooks@link:..":
   version "0.0.0"
   uid ""
 

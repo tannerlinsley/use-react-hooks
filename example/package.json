@@ -1,6 +1,6 @@
 {
-  "name": "use-class-hooks-example",
-  "homepage": "https://tannerlinsley.github.io/use-class-hooks",
+  "name": "use-react-hooks-example",
+  "homepage": "https://tannerlinsley.github.io/use-react-hooks",
   "version": "0.0.0",
   "license": "MIT",
   "private": true,
@@ -9,7 +9,7 @@
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-scripts": "^1.1.4",
-    "use-class-hooks": "link:.."
+    "use-react-hooks": "link:.."
   },
   "scripts": {
     "start": "react-scripts start",

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0
+
+- Renamed project to `use-react-hooks`
+- An HOC and functions are now used instead of a class
+- Added `useImperativeMethods` and proxies for `useMutationEffect => useEffect` and `useLayoutEffect => useEffect`
+- Custom hooks are now supported out of the box
+
 ## 0.2.4
 
 - Actually add `this.useHook` to the source ;)

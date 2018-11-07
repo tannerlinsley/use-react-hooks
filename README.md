@@ -1,8 +1,10 @@
-# use-class-hooks
+# use-react-hooks
 
-Use react hooks in classes in React v16.5+
+`use-react-hooks` is a higher-order-component to support hooks in React v16.6!
 
-⚠️ WARNING: This is an experiment. Do not ship production code with this module!
+- ✂️ Tiny (3kb and 200 LOC)
+- ⛑ Safely reverse-engineered using class lifecycles
+- 🛠 Provides a clean and clear upgrade path to 16.7 when ready.
 
 ## Demos
 
@@ -12,74 +14,48 @@ Use react hooks in classes in React v16.5+
 ## Install
 
 ```bash
-npm install --save use-class-hooks
+npm install --save use-react-hooks
 # or
-yarn add use-class-hooks
+yarn add use-react-hooks
 ```
 
 ## Usage
 
 ```jsx
 import React from "react";
-import "use-class-hooks";
+import { useHooks, useState } from "use-react-hooks";
 
-class Example extends React.Component {
-  render() {
-    const [count, setCount] = this.useState(0);
-    return (
-      <div>
-        Count: {count}
-        <button onClick={() => setCount(old => old + 1)}>Increment</button>
-      </div>
-    );
-  }
-}
+const App = useHooks(props => {
+  const [count, setCount] = useState(0);
+  return (
+    <div>
+      Count: {count}
+      <button onClick={() => setCount(old => old + 1)}>Increment</button>
+    </div>
+  );
+});
 ```
 
 ## Documentation
 
-The following hooks are available on the class instance and follow the official React Hooks API here: https://reactjs.org/docs/hooks-reference.html
+The following hooks are available as named exports from the `use-react-hooks` package and follow the official React Hooks API here: https://reactjs.org/docs/hooks-reference.html
 
-- `this.useReducer`
-- `this.useState`
-- `this.useContext`
-- `this.usePrevious`
-- `this.useMemo`
-- `this.useCallback`
-- `this.useEffect`
-- `this.useRef`
+- `useReducer`
+- `useState`
+- `useContext`
+- `useMemo`
+- `useCallback`
+- `useEffect`
+- `useRef`
+- `useImperativeMethods`
+- `useMutationEffect` _Note: currently identical to `useEffect`_
+- `useLayoutEffect` _Note: currently identical to `useEffect`_
 
-The following hooks are not yet available. Feel free to submit a PR!
+## Additional Hooks
 
-- `this.useImperativeMethods`
-- `this.useMutationEffect`
-- `this.useLayoutEffect`
+The following hooks are also provided for convenience:
 
-## Custom Hooks
-
-You can use a custom hook via the `this.useHook` hook:
-
-```javascript
-// Custom Hook
-function useTodos(a, b, c) {
-  const [todos, setTodos] = this.useState([]);
-  return [
-    todos,
-    {
-      addTodo: todo => setTodos(old => [...old, todo])
-    }
-  ];
-}
-
-// Usage
-class MyComponent extends React.Component {
-  render() {
-    const [todos, { addTodo }] = this.useHook(useTodos, a, b, c);
-  }
-}
-```
-
-Custom Hooks function are executed with the `this` context of the class instance, so you have access to all of the built in react hooks. Also, any parameters passed after the hook function are forwarded to your custom hook.
+- `usePrevious` - Returns the previously rendered value you pass it
 
 ## License
 
