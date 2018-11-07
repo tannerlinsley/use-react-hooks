@@ -14,7 +14,6 @@ const leaseHook = () => {
 }
 
 export function useHooks(fn) {
-  console.log(fn)
   return class HookComponent extends React.Component {
     hooks = [] // A home for our hooks
 

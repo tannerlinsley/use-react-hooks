@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2
+
+- Removed a stray console.log()
+
 ## 1.0.1
 
 - Fixed a bug that prevented react-hot-loader from working correctly (I guess it also overrides class lifecycle events, so there was a clash)
