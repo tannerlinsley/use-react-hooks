@@ -19,28 +19,23 @@ export function useHooks(fn) {
 
     // These are here to ensure effects work properly
     componentDidMount() {
-      this.runEffects()
-    }
-    componentDidUpdate() {
-      this.runUnwinders()
-      this.runEffects()
-    }
-    componentWillUnmount() {
-      this.runUnwinders()
-    }
-
-    runEffects = () => {
       this.hooks.forEach(hook => {
-        if (hook.runEffect) {
-          hook.runEffect()
+        if (hook.didMount) {
+          hook.didMount()
         }
       })
     }
-
-    runUnwinders = () => {
+    componentDidUpdate() {
       this.hooks.forEach(hook => {
-        if (hook.runUnwind) {
-          hook.runUnwind()
+        if (hook.didUpdate) {
+          hook.didUpdate()
+        }
+      })
+    }
+    componentWillUnmount() {
+      this.hooks.forEach(hook => {
+        if (hook.willUnmount) {
+          hook.willUnmount()
         }
       })
     }
@@ -135,17 +130,23 @@ export function useEffect(effect, watchItems) {
   const [hooks, hookID] = leaseHook()
   if (!hooks[hookID]) {
     hooks[hookID] = {
-      shouldUpdate: false,
+      changed: false,
       watchItems: null,
       unwinder: null,
       effect: null,
-      runEffect: () => {
-        if (hooks[hookID].shouldUpdate) {
+      didMount: () => {
+        hooks[hookID].unwind = hooks[hookID].effect()
+      },
+      didUpdate: () => {
+        if (hooks[hookID].changed) {
+          if (hooks[hookID].unwind) {
+            hooks[hookID].unwind()
+          }
           hooks[hookID].unwind = hooks[hookID].effect()
         }
       },
-      runUnwind: () => {
-        if (hooks[hookID].shouldUpdate && hooks[hookID].unwind) {
+      willUnmount: () => {
+        if (hooks[hookID].unwind) {
           hooks[hookID].unwind()
         }
       }
@@ -153,11 +154,11 @@ export function useEffect(effect, watchItems) {
   }
 
   hooks[hookID].effect = effect
-  hooks[hookID].shouldUpdate = false
+  hooks[hookID].changed = false
 
-  let needsUpdate = hasChanged(hooks[hookID].watchItems, watchItems)
-  if (needsUpdate) {
-    hooks[hookID].shouldUpdate = true
+  let changed = hasChanged(hooks[hookID].watchItems, watchItems)
+  if (changed) {
+    hooks[hookID].changed = true
     hooks[hookID].watchItems = watchItems
   }
 }

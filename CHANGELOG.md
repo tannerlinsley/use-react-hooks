@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.6
+
+- Improved effect timing accuracy
+
 ## 1.0.5
 
 - Fix useState and useReducer update failure when value was falsey
