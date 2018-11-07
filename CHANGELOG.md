@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.4
+
+- Actually add `this.useHook` to the source ;)
+
 ## 0.2.3
 
 - Also patch `React.PureComponent`

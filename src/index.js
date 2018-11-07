@@ -151,6 +151,11 @@ function patch(name) {
         record.watchItems = watchItems
       }
     }
+
+    useHook = (hook, ...args) => {
+      return hook.call(this, ...args)
+    }
+
     // Utils
     leaseHookID = () => {
       const index = this.__hookIndex
