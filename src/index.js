@@ -7,27 +7,51 @@ const leaseHook = () => {
   if (!currentFiber) {
     throw new Error('You are trying to use hooks without the `useHooks()` HOC!')
   }
-  const hooks = currentFiber.__hooks
-  const index = currentFiber.__hookIndex
-  currentFiber.__hookIndex++
+  const hooks = currentFiber.hooks
+  const index = currentFiber.hookIndex
+  currentFiber.hookIndex++
   return [hooks, index, currentFiber]
 }
 
 export function useHooks(fn) {
+  console.log(fn)
   return class HookComponent extends React.Component {
-    __hooks = {} // A home for our hooks
+    hooks = [] // A home for our hooks
 
     // These are here to ensure effects work properly
-    componentDidMount() {}
-    componentDidUpdate() {}
-    componentWillUnmount() {}
+    componentDidMount() {
+      this.runEffects()
+    }
+    componentDidUpdate() {
+      this.runUnwinders()
+      this.runEffects()
+    }
+    componentWillUnmount() {
+      this.runUnwinders()
+    }
+
+    runEffects = () => {
+      this.hooks.forEach(hook => {
+        if (hook.runEffect) {
+          hook.runEffect()
+        }
+      })
+    }
+
+    runUnwinders = () => {
+      this.hooks.forEach(hook => {
+        if (hook.runUnwind) {
+          hook.runUnwind()
+        }
+      })
+    }
 
     render() {
       // Every render, we need to update the
       // currentFiber to the class's instance
       // and reset the instance's hookIndex
       currentFiber = this
-      this.__hookIndex = 0
+      this.hookIndex = 0
       const res = fn(this.props)
       currentFiber = null
       return res
@@ -105,55 +129,36 @@ export function useCallback(callback, watchItems) {
 }
 
 export function useEffect(effect, watchItems) {
-  const [hooks, hookID, instance] = leaseHook()
+  const [hooks, hookID] = leaseHook()
   let record
   if (hooks[hookID]) {
     record = hooks[hookID]
   } else {
     hooks[hookID] = {
+      shouldUpdate: false,
       watchItems: null,
-      unwind: null,
-      runEffect: () => {}
+      unwinder: null,
+      effect: null,
+      runEffect: () => {
+        if (record.shouldUpdate) {
+          record.unwind = effect()
+        }
+      },
+      runUnwind: () => {
+        if (record.shouldUpdate && record.unwind) {
+          record.unwind()
+        }
+      }
     }
     record = hooks[hookID]
-
-    const originalComponentDidMount = instance.componentDidMount
-    instance.componentDidMount = (...args) => {
-      originalComponentDidMount.call(this, ...args)
-      record.runEffect()
-    }
-
-    const originalComponentDidUpdate = instance.componentDidUpdate
-    instance.componentDidUpdate = (...args) => {
-      record.doUnwind()
-      originalComponentDidUpdate.call(this, ...args)
-      record.runEffect()
-    }
-
-    const originalComponentWillUnmount = instance.componentWillUnmount
-    instance.componentWillUnmount = (...args) => {
-      record.doUnwind()
-      originalComponentWillUnmount.call(this, ...args)
-    }
   }
 
-  record.runEffect = () => {
-    if (record.shouldRunEffect) {
-      record.unwind = effect()
-    }
-  }
-
-  record.doUnwind = () => {
-    if (record.shouldRunEffect && record.unwind) {
-      record.unwind()
-    }
-  }
-
-  record.shouldRunEffect = false
+  record.effect = effect
+  record.shouldUpdate = false
 
   let needsUpdate = hasChanged(record.watchItems, watchItems)
   if (needsUpdate) {
-    record.shouldRunEffect = true
+    record.shouldUpdate = true
     record.watchItems = watchItems
   }
 }

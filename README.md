@@ -1,6 +1,6 @@
 # use-react-hooks
 
-`use-react-hooks` is a higher-order-component to support hooks in React v16.6!
+`use-react-hooks` adds support for hooks in React v16.6!
 
 - ✂️ Tiny (3kb and 200 LOC)
 - ⛑ Safely reverse-engineered using class lifecycles
@@ -20,6 +20,8 @@ yarn add use-react-hooks
 ```
 
 ## Usage
+
+To use hooks in a functional compoennt, wrap it in `useHooks` then use any hook you want!
 
 ```jsx
 import React from "react";
