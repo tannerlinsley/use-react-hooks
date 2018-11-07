@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4
+
+- Allow useState setters to replace state values if a non-function is passed
+
 ## 1.0.3
 
 - Always use bracket/property notation to avoid stale instance variables

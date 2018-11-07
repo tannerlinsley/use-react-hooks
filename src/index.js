@@ -84,7 +84,10 @@ export function useReducer(reducer, initialState) {
 }
 
 export function useState(initialState) {
-  return useReducer((state, action) => action(state), initialState)
+  return useReducer(
+    (state, action) => (typeof action === 'function' ? action(state) : action),
+    initialState
+  )
 }
 
 export function useContext(context) {
