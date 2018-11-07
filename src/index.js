@@ -71,16 +71,16 @@ export function useRef(initialValue) {
 export function useReducer(reducer, initialState) {
   const [hooks, hookID, instance] = leaseHook()
   if (!hooks[hookID]) {
-    hooks[hookID] = initialState
-  }
-  const dispatch = action => {
-    const newState = reducer(hooks[hookID], action)
-    if (hooks[hookID] !== newState) {
-      hooks[hookID] = newState
-      instance.forceUpdate() // TODO: IS this too naive?
+    hooks[hookID] = {
+      state: initialState
     }
   }
-  return [hooks[hookID], dispatch]
+  const dispatch = action => {
+    const newState = reducer(hooks[hookID].state, action)
+    hooks[hookID].state = newState
+    instance.forceUpdate() // TODO: IS this too naive?
+  }
+  return [hooks[hookID].state, dispatch]
 }
 
 export function useState(initialState) {
@@ -102,10 +102,13 @@ export function useContext(context) {
 
 export function usePrevious(value, watchItems) {
   const [hooks, hookID] = leaseHook()
+  if (!hooks[hookID]) {
+    hooks[hookID] = {}
+  }
   useEffect(() => {
-    hooks[hookID] = value
+    hooks[hookID].previous = value
   }, watchItems)
-  return hooks[hookID]
+  return hooks[hookID].previous
 }
 
 export function useMemo(memo, watchItems) {

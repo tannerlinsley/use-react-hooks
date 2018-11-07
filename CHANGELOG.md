@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.5
+
+- Fix useState and useReducer update failure when value was falsey
+
 ## 1.0.4
 
 - Allow useState setters to replace state values if a non-function is passed
