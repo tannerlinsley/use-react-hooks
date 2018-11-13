@@ -14,7 +14,9 @@ const leaseHook = () => {
 }
 
 export function useHooks(fn) {
-  return class HookComponent extends React.Component {
+  class HookComponent extends React.Component {
+    static displayName = fn.displayName || fn.name
+
     hooks = [] // A home for our hooks
 
     // These are here to ensure effects work properly
@@ -38,19 +40,28 @@ export function useHooks(fn) {
           hook.willUnmount()
         }
       })
+      this.hooks = undefined
     }
 
     render() {
+      const { innerRef, ...rest } = this.props
       // Every render, we need to update the
       // currentFiber to the class's instance
       // and reset the instance's hookIndex
       currentFiber = this
       this.hookIndex = 0
-      const res = fn(this.props)
+      const res = fn(rest, innerRef)
       currentFiber = null
       return res
     }
   }
+  function HookWrapper(props, ref) {
+    return <HookComponent {...props} innerRef={ref} />
+  }
+  Object.keys(fn).forEach(key => {
+    HookWrapper[key] = fn[key]
+  })
+  return HookWrapper
 }
 
 export function useRef(initialValue) {
@@ -67,15 +78,14 @@ export function useReducer(reducer, initialState) {
   const [hooks, hookID, instance] = leaseHook()
   if (!hooks[hookID]) {
     hooks[hookID] = {
-      state: initialState
+      state: initialState,
+      dispatch: action => {
+        hooks[hookID].state = reducer(hooks[hookID].state, action)
+        instance.forceUpdate()
+      }
     }
   }
-  const dispatch = action => {
-    const newState = reducer(hooks[hookID].state, action)
-    hooks[hookID].state = newState
-    instance.forceUpdate() // TODO: IS this too naive?
-  }
-  return [hooks[hookID].state, dispatch]
+  return [hooks[hookID].state, hooks[hookID].dispatch]
 }
 
 export function useState(initialState) {
@@ -86,13 +96,15 @@ export function useState(initialState) {
 }
 
 export function useContext(context) {
-  const dispatcher = getDispatcher()
-  if (!dispatcher) {
-    throw new Error(
-      'Oh no! You are either trying to use this.useContext() outside of a classes render function, or you may not be running React 16.6 or higher.'
+  const [hooks, hookID, instance] = leaseHook()
+  if (!hooks[hookID]) {
+    hooks[hookID] = context
+    const originalRender = instance.render.bind(instance)
+    instance.render = () => (
+      <context.Consumer>{originalRender}</context.Consumer>
     )
   }
-  return getDispatcher().readContext(context)
+  return context._currentValue
 }
 
 export function usePrevious(value, watchItems) {
@@ -199,9 +211,4 @@ function hasChanged(prev, next) {
     needsUpdate = true
   }
   return needsUpdate
-}
-
-function getDispatcher() {
-  return React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED
-    .ReactCurrentOwner.currentDispatcher
 }
