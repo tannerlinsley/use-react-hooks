@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.7
+
+- setState now accepts an object for replacement
+- function statics are now hoisted throughout the wrapper
+- no longer uses secret internals for context
+- immutable dispatcher and setState
+
 ## 1.0.6
 
 - Improved effect timing accuracy
