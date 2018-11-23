@@ -24,7 +24,7 @@
   },
   "peerDependencies": {
     "prop-types": "^15.5.4",
-    "react": "^^16.6.0",
+    "react": "^16.6.0",
     "react-dom": "^16.6.0"
   },
   "devDependencies": {
